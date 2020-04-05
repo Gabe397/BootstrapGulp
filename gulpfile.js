@@ -11,11 +11,18 @@ const jsImport = require('gulp-js-import');
 const sourcemaps = require('gulp-sourcemaps');
 const htmlPartial = require('gulp-html-partial');
 const clean = require('gulp-clean');
+const newer =require('gulp-newer');
 const isProd = process.env.NODE_ENV === 'prod';
 
 const htmlFile = [
     'src/*.html'
 ]
+
+devBuild = (process.env.NODE_ENV !== 'production')
+
+src = 'src/'
+
+build = 'build/'
 
 function html() {
     return gulp.src(htmlFile)
@@ -55,6 +62,23 @@ function img() {
         .pipe(gulp.dest('docs/img/'));
 }
 
+function images() {
+
+    const out = build + 'img/';
+
+    return gulp.src('src/img/*')
+        .pipe(newer(out))
+        .pipe(imagemin({ optimizationLevel: 5 }))
+        .pipe(gulp.dest(out));
+
+}
+
+
+
+
+
+
+
 function serve() {
     browserSync.init({
         open: true,
@@ -88,3 +112,4 @@ exports.js = js;
 exports.del = del;
 exports.serve = gulp.parallel(html, css, js, img, watchFiles, serve);
 exports.default = gulp.series(del, html, css, js, img);
+exports.images = images;
